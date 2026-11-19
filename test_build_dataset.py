@@ -61,8 +61,9 @@ class ParserTests(unittest.TestCase):
         current = match("2020-03-01", "schema")
         current["row"].update(winner_rank="10", loser_rank="50", winner_hand="L", loser_hand="R")
         features, target, _ = build([current], args())[0]
-        self.assertEqual(len(features), 99)
-        self.assertEqual(sum(k.startswith("diff_") for k in features), 58)
+        self.assertEqual(len(features), 79)
+        self.assertFalse(any(k.endswith("_opportunities") for k in features))
+        self.assertEqual(sum(k.startswith("diff_") for k in features), 38)
         self.assertEqual(features["diff_rank"], -40 if target["a_wins"] else 40)
         self.assertIsNone(features["diff_age"])
         self.assertEqual(features["a_hand_L"], target["a_wins"])

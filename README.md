@@ -46,10 +46,10 @@ Historical features include:
 - Previous-20-match ace rate, double-fault rate, first-serve-in rate, first- and second-serve
   points-won rates, service and return points-won rates, break-point save rate, hold rate and break rate.
 - The same serving/return rates for same-surface matches **within the previous 20 overall matches**.
-- Opportunity counts for each rate and counts of matches with serve data, so sparse histories are visible.
+- Counts of historical matches with serve data; opportunity-count features are omitted for simplicity.
 - A-minus-B differences for numeric player features; individual numeric A/B columns are omitted.
 
-The model input has **99 columns**: 58 numeric differences, 18 player-specific hand/entry
+The model input has **79 columns**: 38 numeric differences, 18 player-specific hand/entry
 indicators and 23 match-context columns. Player-specific categorical indicators remain because
 they have no difference-column equivalent. Targets and player-identifying metadata are separate.
 

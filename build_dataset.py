@@ -167,8 +167,6 @@ def aggregate(records):
                 add("break_rate", rec["opp_bpFaced"] - rec["opp_bpSaved"], rec["opp_SvGms"])
     result = {name: ratio(*sums[name]) for name in RATES}
     result["serve_stats_matches"] = serve_count
-    for name in RATES:
-        result[name + "_opportunities"] = sums[name][1]
     return result
 
 
