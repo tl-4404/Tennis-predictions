@@ -47,7 +47,11 @@ Historical features include:
   points-won rates, service and return points-won rates, break-point save rate, hold rate and break rate.
 - The same serving/return rates for same-surface matches **within the previous 20 overall matches**.
 - Opportunity counts for each rate and counts of matches with serve data, so sparse histories are visible.
-- A-minus-B differences for numeric player features, alongside each player's own values.
+- A-minus-B differences for numeric player features; individual numeric A/B columns are omitted.
+
+The model input has **99 columns**: 58 numeric differences, 18 player-specific hand/entry
+indicators and 23 match-context columns. Player-specific categorical indicators remain because
+they have no difference-column equivalent. Targets and player-identifying metadata are separate.
 
 Ratios use pooled counts, not an unweighted mean of percentages. Double-fault rate here is
 double faults per **service point**. Second-serve denominator is service points minus first serves in,
@@ -73,7 +77,7 @@ The source's `tourney_date` is generally the tournament's start date, not the ac
 6. Pre-tournament ranking, age and other supplied player fields come from the current source row.
    Current match score, duration and performance statistics are used only as targets or in later histories.
 
-The default split is training 2012–2021, validation 2022, test 2023–2024. Keep every tournament in
+The default split is training 2012–2022, validation 2023, test 2024. Keep every tournament in
 one split. This is a **rolling historical evaluation**: validation/test features can include earlier
 results from those periods once the history cutoff allows them, as they would become available in use.
 For cross-validation, use chronological folds rather than random shuffling.

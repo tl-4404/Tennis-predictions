@@ -39,12 +39,11 @@ class ParserTests(unittest.TestCase):
         self.assertIsNone(aggregate([])["ace_rate"])
 
     def test_cutoff_and_current_tournament_are_excluded(self):
-        matches = [match("2020-01-01", "old"), match("2020-01-05", "boundary"),
+        matches = [match("2020-01-01", "old", loser="3"), match("2020-01-05", "boundary"),
                    match("2020-02-02", "current_a"), match("2020-02-02", "current_b")]
         rows = build(matches, args())
-        for features, _, _ in rows[-2:]:
-            self.assertEqual(features["a_history_matches"], 1)
-            self.assertEqual(features["b_history_matches"], 1)
+        for features, _, meta in rows[-2:]:
+            self.assertEqual(features["diff_history_matches"], 1 if meta["a_id"] == "1" else -1)
         self.assertEqual(rows[-1][2]["history_cutoff"], "2020-01-05")
 
     def test_changing_current_or_future_outcomes_does_not_change_inputs(self):
@@ -57,6 +56,22 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(original[1][0], changed[1][0])
         self.assertNotEqual(original[1][1]["a_wins"], changed[1][1]["a_wins"])
         self.assertEqual(original[1][2]["a_id"], changed[1][2]["a_id"])
+
+    def test_only_numeric_differences_are_exported(self):
+        current = match("2020-03-01", "schema")
+        current["row"].update(winner_rank="10", loser_rank="50", winner_hand="L", loser_hand="R")
+        features, target, _ = build([current], args())[0]
+        self.assertEqual(len(features), 99)
+        self.assertEqual(sum(k.startswith("diff_") for k in features), 58)
+        self.assertEqual(features["diff_rank"], -40 if target["a_wins"] else 40)
+        self.assertIsNone(features["diff_age"])
+        self.assertEqual(features["a_hand_L"], target["a_wins"])
+        self.assertEqual(features["b_hand_L"], 1 - target["a_wins"])
+        self.assertIn("a_entry_Direct", features)
+        self.assertEqual(features["surface_Hard"], 1)
+        self.assertTrue(all(not k.startswith(("a_", "b_")) or
+                            k.startswith(("a_hand_", "b_hand_", "a_entry_", "b_entry_"))
+                            for k in features))
 
     def test_regression_targets_follow_player_orientation(self):
         features, target, meta = build([match("2020-01-01", "one", score="6-1 6-2")], args())[0]

@@ -239,7 +239,9 @@ def build(matches, args):
             for category in ("Direct", "Q", "WC", "LL", "PR", "Other"):
                 f["entry_" + category] = int((entry if entry in ("Direct", "Q", "WC", "LL", "PR") else "Other") == category)
             side_features.append(f)
-            features.update({label + "_" + k: v for k, v in f.items()})
+            # Export categories by player; numeric measurements are exported as A-minus-B only.
+            features.update({label + "_" + k: v for k, v in f.items()
+                             if k.startswith(("hand_", "entry_"))})
         for name in side_features[0]:
             if not name.startswith(("hand_", "entry_")):
                 a, b = side_features[0][name], side_features[1][name]
@@ -287,8 +289,8 @@ def main():
     parser.add_argument("--window", type=int, default=20)
     parser.add_argument("--history-lag-days", type=int, default=28)
     parser.add_argument("--min-history", type=int, default=5)
-    parser.add_argument("--train-end-year", type=int, default=2021)
-    parser.add_argument("--validation-end-year", type=int, default=2022)
+    parser.add_argument("--train-end-year", type=int, default=2022)
+    parser.add_argument("--validation-end-year", type=int, default=2023)
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
     if args.window < 1 or args.history_lag_days < 1 or args.min_history < 0:
